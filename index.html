@@ -16,35 +16,56 @@
     <div class="container" id="repos"></div>
     
     <script>
-    const username = "AyaanDhalait";
-    
-    fetch(`https://api.github.com/users/${username}/repos`)
-    .then(res => res.json())
-    .then(data => {
-      const container = document.getElementById("repos");
-    
-      data.forEach(repo => {
-        const div = document.createElement("div");
-        div.className = "repo";
-    
-        div.innerHTML = `
-          <a href="repo.html?name=${repo.name}">${repo.name}</a>
-          <div class="repo-desc">${repo.description || ""}</div>
-          <div class="repo-meta">
-  ${repo.language || ""}
-  <span class="star">
-    <svg aria-label="stars" role="img" viewBox="0 0 16 16">
-      <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"></path>
-    </svg>
-    <span>${repo.stargazers_count}</span>
-  </span>
-</div>
-        `;
-    
-        container.appendChild(div);
-      });
-    });
-    </script>
+const username = "AyaanDhalait";
+
+const container = document.getElementById("repos");
+
+container.innerHTML = "Loading...";
+
+fetch(`https://api.github.com/users/${username}/repos`)
+.then(res => {
+  if (!res.ok) throw new Error("API failed: " + res.status);
+  return res.json();
+})
+.then(data => {
+
+  container.innerHTML = "";
+
+  if (!Array.isArray(data)) {
+    container.innerHTML = "No data returned";
+    return;
+  }
+
+  data.forEach(repo => {
+    const div = document.createElement("div");
+    div.className = "repo";
+
+    div.innerHTML = `
+      <a href="./repo.html?name=${repo.name}">${repo.name}</a>
+      <div class="repo-desc">${repo.description || ""}</div>
+      <div class="repo-meta">
+        ${repo.language || ""}
+        <span class="star">
+          <svg viewBox="0 0 16 16" width="14" height="14">
+            <path fill="white" d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/>
+          </svg>
+          <span>${repo.stargazers_count}</span>
+        </span>
+      </div>
+    `;
+
+    container.appendChild(div);
+  });
+})
+.catch(err => {
+  container.innerHTML = `
+    <div style="color:red">
+      Failed to load repos<br>
+      ${err.message}
+    </div>
+  `;
+});
+</script>
     
     </body>
 </html>
