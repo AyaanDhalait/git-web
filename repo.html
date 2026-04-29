@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Repo</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="topbar">
+      <strong>git.ayaan.is-a.dev</strong>
+    </div>
+    
+    <div class="container">
+      <div class="repo-header">
+        <span>repo /</span> <strong id="title"></strong>
+      </div>
+    
+      <div class="file-table" id="files"></div>
+    </div>
+    
+    <script>
+    const params = new URLSearchParams(window.location.search);
+    const repo = params.get("name");
+    const path = params.get("path") || "";
+    const username = "AyaanDhalait";
+    
+    document.getElementById("title").innerText = repo;
+    
+    fetch(`https://api.github.com/repos/${username}/${repo}/contents/${path}`)
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById("files");
+    
+      data.forEach(file => {
+        const row = document.createElement("div");
+        row.className = "file-row";
+    
+        row.innerHTML = `
+          <a class="file-name" href="${
+            file.type === "file"
+            ? `file.html?repo=${repo}&path=${file.path}`
+            : `repo.html?name=${repo}&path=${file.path}`
+          }">${file.name}</a>
+    
+          <span class="file-type">${file.type}</span>
+        `;
+    
+        container.appendChild(row);
+      });
+    });
+    </script>
+    
+    </body>
+</html>
